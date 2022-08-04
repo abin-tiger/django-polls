@@ -30,6 +30,7 @@ ALLOWED_HOSTS = os.getenv('DJANGO_ALLOWED_HOSTS', '127.0.0.1').split(',')
 
 # Application definition
 INSTALLED_APPS = [
+    'aws_xray_sdk.ext.django',
     'polls.apps.PollsConfig',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -41,6 +42,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'aws_xray_sdk.ext.django.middleware.XRayMiddleware',
     'django.middleware.security.SecurityMiddleware',
     "whitenoise.middleware.WhiteNoiseMiddleware",
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -171,3 +173,9 @@ logging.config.dictConfig({
         },
     },
 })
+
+
+XRAY_RECORDER = {
+    'AWS_XRAY_TRACING_NAME': 'Django Polls',
+    'PLUGINS': ('EC2Plugin'),
+}
