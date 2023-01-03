@@ -176,6 +176,8 @@ logging.config.dictConfig({
 
 
 XRAY_RECORDER = {
-    'AWS_XRAY_TRACING_NAME': 'Django Polls',
-    'PLUGINS': ('EC2Plugin'),
+    'AUTO_INSTRUMENT': True,
+    # 'SAMPLING': False,
+    # 'PLUGINS': ('ElasticBeanstalkPlugin', 'EC2Plugin', 'ECSPlugin'),
+    # 'AWS_XRAY_DAEMON_ADDRESS': "xray:2000"
 }

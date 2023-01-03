@@ -1,0 +1,61 @@
+version: '3.1'
+
+volumes:
+  pgdata:
+
+services:
+
+  db:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: example
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 7000:8080
+  
+  app:
+    image: django-polls
+    # command: |
+    #   python manage.py runserver 0:8000
+    # command: |
+    #   sh -c "python manage.py makemigrations && python manage.py migrate && python manage.py createsuperuser --noinput --email=admin@django.com"
+    environment:
+      # DJANGO_SUPERUSER_USERNAME: admin
+      # DJANGO_SUPERUSER_PASSWORD: password
+      DATABASE_ENGINE: postgresql_psycopg2
+      DATABASE_NAME: polls
+      DATABASE_USERNAME: postgres
+      DATABASE_PASSWORD: example
+      DATABASE_HOST: db
+      DATABASE_PORT: 5432
+      DJANGO_ALLOWED_HOSTS: "*"
+      DJANGO_SECRET_KEY: "#_s65q(u$y8ib1m31!e=1qx)sk7+=17l0n=ws2)s^tb%c(7uee"
+      DEBUG: "True"
+      # DJANGO_LOGLEVEL: debug
+      # STATIC_BUCKET_NAME: "mcd-metaflow-batch"
+      AWS_XRAY_SDK_ENABLED: "true"
+      AWS_XRAY_DAEMON_ADDRESS: "xray:2000"
+      AWS_XRAY_TRACING_NAME: "Django Polls"
+    ports:
+      - 7777:8000
+  xray:
+    image: amazon/aws-xray-daemon
+    command:
+      - --local-mode
+      - --region=us-east-1
+      - --role-arn=arn:aws:iam::752564314130:role/mle-admin-role
+    environment:
+      # AWS_PROFILE: tiger-mle-admin
+      AWS_ACCESS_KEY_ID: "AKIASP7UJXVCYYHQIYPA"
+      AWS_SECRET_ACCESS_KEY: "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"
+    ports:
+      - 2000:2000/udp
+      - 2000:2000/tcp
+    volumes:
+      - /home/abin/.aws:/home/xray/.aws
